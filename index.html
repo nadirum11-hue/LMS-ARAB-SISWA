@@ -34,7 +34,6 @@
     <div><h1>Portal Belajar Bahasa Arab</h1><p>Media pembelajaran untuk guru dan siswa</p></div>
   </header>
   <main>
-    <div class="notice" id="status">Aplikasi memerlukan koneksi internet untuk memuat layanan Google Apps Script. Anda dapat memasang pintasan aplikasi ini ke perangkat.</div>
     <div class="actions">
       <button class="button" id="installBtn" hidden>Pasang aplikasi</button>
       <a class="button" href="https://script.google.com/macros/s/AKfycbyDW-T6Ou7Uzww4EnjuBLEIlDJ8zsQIyCSuf84bXfr6shIihqWsAxkMfqHxiGCGfLzj/exec" target="_blank" rel="noopener">Buka aplikasi langsung</a>
@@ -46,19 +45,14 @@
 <script>
 (() => {
   const installBtn = document.getElementById('installBtn');
-  const status = document.getElementById('status');
   let installPrompt = null;
 
   document.getElementById('reloadBtn').addEventListener('click', () => location.reload());
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(() => { status.textContent = 'PWA siap. Untuk membuka isi aplikasi, koneksi internet tetap diperlukan karena layanan berjalan melalui Google Apps Script.'; })
-        .catch(() => { status.textContent = 'Halaman dapat digunakan, tetapi service worker belum berhasil didaftarkan. Pastikan GitHub Pages aktif melalui HTTPS.'; });
+      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
     });
-  } else {
-    status.textContent = 'Untuk memasang PWA, buka situs yang sudah diterbitkan melalui HTTPS di GitHub Pages.';
   }
 
   window.addEventListener('beforeinstallprompt', (event) => {
@@ -75,7 +69,6 @@
   });
   window.addEventListener('appinstalled', () => {
     installBtn.hidden = true;
-    status.textContent = 'Aplikasi berhasil dipasang di perangkat.';
   });
 })();
 </script>
