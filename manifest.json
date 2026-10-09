@@ -1,0 +1,11 @@
+{
+  "name": "Portal Belajar Bahasa Arab",
+  "short_name": "Belajar Arab",
+  "description": "Media pembelajaran bahasa Arab untuk guru dan siswa.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f7f4",
+  "theme_color": "#07583f",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
