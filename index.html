@@ -2,26 +2,30 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b6b4b">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07583f">
+  <meta name="description" content="Portal pembelajaran Bahasa Arab untuk guru dan siswa.">
   <title>Portal Belajar Bahasa Arab</title>
-  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
   <link rel="manifest" href="./manifest.json">
   <style>
-    :root{color-scheme:light;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#18352b;background:#f3f7f4}
     *{box-sizing:border-box}
-    body{margin:0;background:#f3f7f4;color:#18352b}
-    header{display:flex;align-items:center;gap:14px;padding:14px clamp(16px,4vw,40px);background:#07583f;color:#fff;box-shadow:0 3px 16px #082f241c}
+    body{margin:0;min-height:100vh}
+    header{display:flex;align-items:center;gap:13px;padding:13px max(16px,env(safe-area-inset-left));background:#07583f;color:white;box-shadow:0 3px 16px #082f241c}
     header img{width:48px;height:48px;flex:none}
-    h1{font-size:clamp(1rem,2.4vw,1.35rem);margin:0}
+    h1{font-size:clamp(1rem,2.5vw,1.35rem);margin:0}
     header p{margin:3px 0 0;font-size:.85rem;color:#d7f2e5}
-    main{max-width:1200px;margin:24px auto;padding:0 16px}
-    .notice{padding:14px 16px;border:1px solid #cde5d8;border-radius:14px;background:#fff;margin-bottom:16px;line-height:1.5}
-    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-    a.button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:10px;padding:11px 16px;font-weight:650;background:#08764f;color:white}
-    a.secondary{background:#e2f2e9;color:#07583f}
-    .app-frame{width:100%;height:calc(100vh - 190px);min-height:540px;border:1px solid #d7e4dc;border-radius:14px;background:white}
-    footer{text-align:center;color:#567166;font-size:.8rem;padding:16px}
+    main{max-width:1200px;margin:20px auto;padding:0 14px}
+    .notice{padding:13px 15px;border:1px solid #cde5d8;border-radius:14px;background:#fff;margin-bottom:13px;line-height:1.5}
+    .actions{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px}
+    a.button,button.button{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:10px;padding:11px 15px;font:inherit;font-weight:650;text-decoration:none;background:#08764f;color:#fff;cursor:pointer}
+    a.secondary,button.secondary{background:#e2f2e9;color:#07583f}
+    .frame{width:100%;height:calc(100dvh - 190px);min-height:500px;border:1px solid #d7e4dc;border-radius:14px;background:white}
+    footer{text-align:center;color:#567166;font-size:.8rem;padding:15px}
+    #installBtn[hidden]{display:none}
+    @media(max-width:600px){main{margin:12px auto}.frame{height:calc(100dvh - 245px);min-height:420px}header img{width:42px;height:42px}}
   </style>
 </head>
 <body>
@@ -30,13 +34,50 @@
     <div><h1>Portal Belajar Bahasa Arab</h1><p>Media pembelajaran untuk guru dan siswa</p></div>
   </header>
   <main>
-    <div class="notice">Aplikasi dijalankan melalui Google Apps Script. Jika aplikasi tidak tampil di dalam bingkai, gunakan tombol <b>Buka aplikasi langsung</b>.</div>
+    <div class="notice" id="status">Aplikasi memerlukan koneksi internet untuk memuat layanan Google Apps Script. Anda dapat memasang pintasan aplikasi ini ke perangkat.</div>
     <div class="actions">
+      <button class="button" id="installBtn" hidden>Pasang aplikasi</button>
       <a class="button" href="https://script.google.com/macros/s/AKfycbyDW-T6Ou7Uzww4EnjuBLEIlDJ8zsQIyCSuf84bXfr6shIihqWsAxkMfqHxiGCGfLzj/exec" target="_blank" rel="noopener">Buka aplikasi langsung</a>
-      <a class="button secondary" href="./icon.svg" target="_blank" rel="noopener">Lihat ikon aplikasi</a>
+      <button class="button secondary" id="reloadBtn" type="button">Muat ulang</button>
     </div>
-    <iframe class="app-frame" title="Aplikasi Belajar Bahasa Arab" src="https://script.google.com/macros/s/AKfycbyDW-T6Ou7Uzww4EnjuBLEIlDJ8zsQIyCSuf84bXfr6shIihqWsAxkMfqHxiGCGfLzj/exec" loading="eager" allow="fullscreen"></iframe>
+    <iframe class="frame" title="Aplikasi Belajar Bahasa Arab" src="https://script.google.com/macros/s/AKfycbyDW-T6Ou7Uzww4EnjuBLEIlDJ8zsQIyCSuf84bXfr6shIihqWsAxkMfqHxiGCGfLzj/exec" loading="eager" allow="fullscreen"></iframe>
   </main>
-  <footer>Portal Belajar Bahasa Arab</footer>
+  <footer>Portal Belajar Bahasa Arab · PWA</footer>
+<script>
+(() => {
+  const installBtn = document.getElementById('installBtn');
+  const status = document.getElementById('status');
+  let installPrompt = null;
+
+  document.getElementById('reloadBtn').addEventListener('click', () => location.reload());
+
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(() => { status.textContent = 'PWA siap. Untuk membuka isi aplikasi, koneksi internet tetap diperlukan karena layanan berjalan melalui Google Apps Script.'; })
+        .catch(() => { status.textContent = 'Halaman dapat digunakan, tetapi service worker belum berhasil didaftarkan. Pastikan GitHub Pages aktif melalui HTTPS.'; });
+    });
+  } else {
+    status.textContent = 'Untuk memasang PWA, buka situs yang sudah diterbitkan melalui HTTPS di GitHub Pages.';
+  }
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    installPrompt = event;
+    installBtn.hidden = false;
+  });
+  installBtn.addEventListener('click', async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    installBtn.hidden = true;
+  });
+  window.addEventListener('appinstalled', () => {
+    installBtn.hidden = true;
+    status.textContent = 'Aplikasi berhasil dipasang di perangkat.';
+  });
+})();
+</script>
 </body>
 </html>
